@@ -1,15 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Vulnerabilities.Api.Data;
 using Vulnerabilities.Api.Helpers;
 using Vulnerabilities.Api.Models;
 using Vulnerabilities.Api.Repositories;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+        options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+    });
+
+builder.Services.AddAutoMapper(typeof(VulnProfile));
 
 builder.Services.AddDbContext<VulnContext>(options =>
 {
@@ -17,18 +29,6 @@ builder.Services.AddDbContext<VulnContext>(options =>
 });
 builder.Services.AddScoped<IVulnRepo, VulnRepo>();
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-    options.SerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower;
-    options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    options.SerializerOptions.Converters.Add(new DateTimeConverter());
-});
-
-// Force snake_case for swashbuckle.
-builder.Services.AddTransient<ISerializerDataContractResolver>(_ => new JsonSerializerDataContractResolver(
-    new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, }
-));
 
 var app = builder.Build();
 
@@ -47,88 +47,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseExceptionHandler("/error-development");
+}
+else
+{
+    app.UseExceptionHandler("/error");
 }
 
 app.UseHttpsRedirection();
 
-app.MapGet("/vulnerabilities", async (IVulnRepo repo) =>
-{
-    var vulnerability = await repo.GetVulnerabilities();
-
-    return Results.Ok(vulnerability);
-});
-
-app.MapGet("/vulnerabilities/{id}", async (string id, IVulnRepo repo) =>
-{
-    var vulnerability = await repo.GetVulnerability(id);
-    if (vulnerability == null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(vulnerability);
-});
-
-app.MapPost("/vulnerabilities", async (VulnerabilityDTO vulnDTO, IVulnRepo repo) =>
-{
-    var vulnTemp = new Vulnerability
-    {
-        Type = vulnDTO.Type,
-        SpecVersion = vulnDTO.SpecVersion,
-        Created = vulnDTO.Created,
-        Modified = vulnDTO.Modified,
-        Id = $"vulnerability--{Guid.NewGuid()}",
-        Name = vulnDTO.Name,
-        Description = vulnDTO.Description
-    };
-
-    var vulnerability = await repo.CreateVulnerability(vulnTemp);
-    if (vulnerability == null)
-    {
-        return Results.BadRequest();
-    }
-
-    return Results.Created($"/vulnerabilities/{vulnerability.Id}", vulnerability);
-});
-
-app.MapPut("/vulnerabilities/{id}", async (
-    string id,
-    VulnerabilityDTO vulnDTO,
-    IVulnRepo repo) =>
-{
-    if (!await repo.VulnerabilityExists(id))
-    {
-        return Results.NotFound();
-    }
-
-    var vulnerability = new Vulnerability
-    {
-        Type = vulnDTO.Type,
-        SpecVersion = vulnDTO.SpecVersion,
-        Modified = DateTime.UtcNow,
-        Id = id,
-        Name = vulnDTO.Name,
-        Description = vulnDTO.Description
-    };
-
-    var isUpdated = await repo.UpdateVulnerability(id, vulnerability);
-    if (isUpdated == null)
-    {
-        return Results.BadRequest();
-    }
-
-    return Results.Ok(vulnerability);
-});
-
-app.MapDelete("/vulnerabilities/{id}", async (string id, IVulnRepo repo) =>
-{
-    var isDeleted = await repo.DeleteVulnerability(id);
-    if (!isDeleted)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.NoContent();
-});
+app.MapControllers();
 
 app.Run();
