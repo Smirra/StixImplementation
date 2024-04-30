@@ -1,6 +1,7 @@
 using AutoMapper;
+using Vulnerabilities.Api.Models;
 
-namespace Vulnerabilities.Api.Models;
+namespace Vulnerabilities.Api.MappingProfiles;
 public class VulnProfile : Profile
 {
     public VulnProfile()

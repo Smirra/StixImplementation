@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Vulnerabilities.Api.Data;
 using Vulnerabilities.Api.Helpers;
+using Vulnerabilities.Api.MappingProfiles;
 using Vulnerabilities.Api.Models;
 using Vulnerabilities.Api.Repositories;
 

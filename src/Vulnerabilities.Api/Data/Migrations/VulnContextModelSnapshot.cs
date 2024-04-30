@@ -22,25 +22,22 @@ namespace Vulnerabilities.Api.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("Created")
+                    b.Property<DateTime?>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("Modified")
+                    b.Property<DateTime?>("Modified")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SpecVersion")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
