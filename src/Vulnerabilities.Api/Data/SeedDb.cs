@@ -1,10 +1,11 @@
 using Bogus;
+using Microsoft.AspNetCore.Identity;
 using Vulnerabilities.Api.Models;
 
 namespace Vulnerabilities.Api.Data;
 public static class SeedDb
 {
-    public static void SeedVulnerabilities(VulnContext context)
+    public static void SeedVulnerabilities(VulnDbContext context)
     {
         var vulnerabilityFaker = new Faker<Vulnerability>()
             .RuleFor(v => v.Type, f => "vulnerability")
@@ -19,5 +20,32 @@ public static class SeedDb
 
         context.Vulnerabilities.AddRange(vulnerabilities);
         context.SaveChanges();
+    }
+
+    public static async void SeedRoles(RoleManager<IdentityRole> roleManager)
+    {
+        await roleManager.CreateAsync(new IdentityRole(Constants.Roles.Reader));
+        await roleManager.CreateAsync(new IdentityRole(Constants.Roles.Editor));
+    }
+
+    public static async void SeedUsers(UserManager<IdentityUser> userManager)
+    {
+        var userTemplate = new IdentityUser
+        {
+            UserName = "reader",
+            Email = "reader@reader.read"
+        };
+        await userManager.CreateAsync(userTemplate, "password");
+        var user = await userManager.FindByNameAsync(userTemplate.UserName);
+        await userManager.AddToRoleAsync(user!, Constants.Roles.Reader);
+
+        userTemplate = new IdentityUser
+        {
+            UserName = "editor",
+            Email = "editor@editor.edit"
+        };
+        await userManager.CreateAsync(userTemplate, "password");
+        user = await userManager.FindByNameAsync(userTemplate.UserName);
+        await userManager.AddToRoleAsync(user!, Constants.Roles.Editor);
     }
 }
