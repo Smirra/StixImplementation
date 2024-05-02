@@ -41,15 +41,16 @@ public class UserController(SignInManager<IdentityUser> signInManager, IConfigur
         var tokenHandler = new JwtSecurityTokenHandler();
 
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Secret"]!);
-        var claims = new[] {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!),
-        }
-                            .Concat(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        var claims = new List<Claim> {
+            new(ClaimTypes.Name, user.UserName!),
+            new(ClaimTypes.NameIdentifier, user.Id!),
+        };
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(500),
+            Expires = DateTime.UtcNow.AddMinutes(20),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
             Issuer = _config["Jwt:Issuer"],
             Audience = _config["Jwt:Audience"],

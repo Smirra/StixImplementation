@@ -14,7 +14,9 @@ public static class SeedDb
             .RuleFor(v => v.Created, f => f.Date.Past())
             .RuleFor(v => v.Modified, f => f.Date.Past())
             .RuleFor(v => v.Name, f => $"CVE-{f.Date.Between(new DateTime(2010, 1, 1), DateTime.Today).Year}-{f.Random.Number(10000, 9999999)}")
-            .RuleFor(v => v.Description, f => f.Lorem.Sentence(30));
+            .RuleFor(v => v.Description, f => f.Lorem.Sentence(30))
+            .RuleFor(v => v.MagnussonSeverity, f => f.Random.Number(0, 100))
+            .RuleFor(v => v.Status, f => f.PickRandom("open", "resolved", "dismissed"));
 
         var vulnerabilities = vulnerabilityFaker.Generate(250);
 

@@ -209,6 +209,18 @@ namespace Vulnerabilities.Api.Data.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vulnerabilities_Id",
+                table: "Vulnerabilities",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vulnerabilities_Name",
+                table: "Vulnerabilities",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />

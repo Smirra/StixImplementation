@@ -11,7 +11,7 @@ using Vulnerabilities.Api.Data;
 namespace Vulnerabilities.Api.Data.Migrations
 {
     [DbContext(typeof(VulnDbContext))]
-    [Migration("20240501102853_InitialCreate")]
+    [Migration("20240502143903_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -236,6 +236,12 @@ namespace Vulnerabilities.Api.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Vulnerabilities");
                 });
