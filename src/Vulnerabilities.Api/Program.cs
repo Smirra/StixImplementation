@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Vulnerabilities.Api.Data;
-using Vulnerabilities.Api.Helpers;
 using Vulnerabilities.Api.MappingProfiles;
 using Vulnerabilities.Api.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Vulnerabilities.Api;
+using Vulnerabilities.Api.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -126,3 +126,5 @@ app.MapControllers();
 
 
 app.Run();
+
+public partial class Program { }

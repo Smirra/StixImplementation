@@ -1,6 +1,6 @@
 namespace Vulnerabilities.Api.Models;
 
-public class PaginationWrapper<T>(IEnumerable<T> items, int count, int pageNumber, int pageSize)
+public class VulnRspWrapper<T>(IEnumerable<T> items, int count, int pageNumber, int pageSize)
 {
     public int CurrentPage { get; private set; } = pageNumber;
     public int TotalPages { get; private set; } = (int)Math.Ceiling(count / (double)pageSize);
