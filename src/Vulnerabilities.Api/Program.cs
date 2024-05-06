@@ -118,7 +118,6 @@ else
     app.UseExceptionHandler("/error");
 }
 
-
 app.UseAuthentication();
 app.UseAuthorization();
 
